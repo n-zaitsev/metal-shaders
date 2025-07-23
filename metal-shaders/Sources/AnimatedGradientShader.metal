@@ -13,7 +13,7 @@ struct VertexOut {
     float2 texCoord;
 };
 
-vertex VertexOut vertexShader(uint vertexID [[vertex_id]],
+vertex VertexOut gradientVertexShader(uint vertexID [[vertex_id]],
                               constant float2 *vertices [[buffer(0)]]) {
     VertexOut out;
     out.position = float4(vertices[vertexID], 0.0, 1.0);
@@ -43,6 +43,6 @@ float4 gradient(float2 fragCoord, float2 resolution, float time) {
 }
 
 
-fragment float4 fragmentShader(VertexOut in [[stage_in]], constant Uniforms &uniforms [[buffer(0)]]) {
+fragment float4 gradientFragmentShader(VertexOut in [[stage_in]], constant Uniforms &uniforms [[buffer(0)]]) {
     return gradient(in.texCoord * uniforms.resolution, uniforms.resolution, uniforms.time);
 }

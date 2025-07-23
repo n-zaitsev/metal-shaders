@@ -15,26 +15,28 @@ struct Uniforms {
 }
 
 final class MetalView: MTKView {
-    var commandQueue: MTLCommandQueue!
-    var pipelineState: MTLRenderPipelineState!
-    var time: Float = 0.0
-    var vertexBuffer: MTLBuffer!
+    private var commandQueue: MTLCommandQueue!
+    private var pipelineState: MTLRenderPipelineState!
+    private var time: Float = 0.0
+    private var vertexBuffer: MTLBuffer!
     var animationSpeed: Float = 1
+    private let contentItem: ContentItem
 
     let vertices: [SIMD2<Float>] = [
         [-1.0, -1.0], [1.0, -1.0], [-1.0, 1.0],
         [-1.0, 1.0], [1.0, -1.0], [1.0, 1.0]
     ]
 
-    init(frame: CGRect, animationSpeed: Float = 1.0) {
+    init(frame: CGRect, animationSpeed: Float = 1.0, contentItem: ContentItem) {
+        self.contentItem = contentItem
         super.init(frame: frame, device: MTLCreateSystemDefaultDevice())
         self.animationSpeed = animationSpeed
         setupMetal()
     }
 
+    @available(*, unavailable)
     required init(coder: NSCoder) {
-        super.init(coder: coder)
-        setupMetal()
+        fatalError("Coder init is not supported")
     }
 
     func setupMetal() {
@@ -42,8 +44,8 @@ final class MetalView: MTKView {
         self.commandQueue = device.makeCommandQueue()
 
         guard let library = device.makeDefaultLibrary(),
-              let fragmentFunction = library.makeFunction(name: "fragmentShader"),
-              let vertexFunction = library.makeFunction(name: "vertexShader")
+              let fragmentFunction = library.makeFunction(name: contentItem.fragmentFunctionName),
+              let vertexFunction = library.makeFunction(name: contentItem.vertexFunctionName)
         else { return }
 
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
@@ -90,8 +92,16 @@ final class MetalView: MTKView {
 }
 
 struct MetalViewRepresentable: NSViewRepresentable {
+    private let animationSpeed: Float
+    private let contentItem: ContentItem
+
+    init(animationSpeed: Float, contentItem: ContentItem) {
+        self.animationSpeed = animationSpeed
+        self.contentItem = contentItem
+    }
+
     func makeNSView(context: Context) -> MetalView {
-        let metalView = MetalView(frame: .zero, animationSpeed: 1.0)
+        let metalView = MetalView(frame: .zero, animationSpeed: animationSpeed, contentItem: contentItem)
         metalView.preferredFramesPerSecond = 60
         metalView.enableSetNeedsDisplay = true
         metalView.isPaused = false
@@ -99,6 +109,6 @@ struct MetalViewRepresentable: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: MetalView, context: Context) {
-        nsView.animationSpeed = 1.0
+        nsView.animationSpeed = animationSpeed
     }
 }

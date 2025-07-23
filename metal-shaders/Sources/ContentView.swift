@@ -1,10 +1,21 @@
 import SwiftUI
 
+struct ViewModel {
+    let items: [ContentItem]
+}
+
 public struct ContentView: View {
-    public init() {}
+    @State private var viewModel: ViewModel = .init(items: [.animatedGradient])
 
     public var body: some View {
-        MetalViewRepresentable()
+        NavigationStack {
+            List(viewModel.items) { item in
+                NavigationLink(item.title) {
+                    MetalViewRepresentable(animationSpeed: 1.0, contentItem: item)
+                        .navigationTitle(item.title)
+                }
+            }
+        }
     }
 }
 
