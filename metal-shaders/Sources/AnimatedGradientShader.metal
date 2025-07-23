@@ -6,25 +6,8 @@
 //
 
 #include <metal_stdlib>
+#include "DefaultTypes.h"
 using namespace metal;
-
-struct VertexOut {
-    float4 position [[position]];
-    float2 texCoord;
-};
-
-vertex VertexOut gradientVertexShader(uint vertexID [[vertex_id]],
-                              constant float2 *vertices [[buffer(0)]]) {
-    VertexOut out;
-    out.position = float4(vertices[vertexID], 0.0, 1.0);
-    out.texCoord = vertices[vertexID] * 0.5 + 0.5; // map from [-1; 1] to [0; 1]
-    return out;
-}
-
-struct Uniforms {
-    float2 resolution;
-    float time;
-};
 
 float4 gradient(float2 fragCoord, float2 resolution, float time) {
     float loopedTime = sin(time);

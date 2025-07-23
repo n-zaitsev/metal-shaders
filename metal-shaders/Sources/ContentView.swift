@@ -5,7 +5,7 @@ struct ViewModel {
 }
 
 public struct ContentView: View {
-    @State private var viewModel: ViewModel = .init(items: [.animatedGradient])
+    @State private var viewModel: ViewModel = .init(items: ContentItem.allCases)
 
     public var body: some View {
         NavigationStack {
