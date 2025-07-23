@@ -11,7 +11,7 @@ public struct ContentView: View {
         NavigationStack {
             List(viewModel.items) { item in
                 NavigationLink(item.title) {
-                    MetalViewRepresentable(animationSpeed: 1.0, contentItem: item)
+                    MetalViewRepresentable(animationSpeed: item.animationSpeed, contentItem: item)
                         .navigationTitle(item.title)
                 }
             }
