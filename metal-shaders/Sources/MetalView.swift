@@ -91,7 +91,7 @@ final class MetalView: MTKView {
 
 struct MetalViewRepresentable: NSViewRepresentable {
     func makeNSView(context: Context) -> MetalView {
-        let metalView = MetalView(frame: .zero, animationSpeed: 0.5)
+        let metalView = MetalView(frame: .zero, animationSpeed: 1.0)
         metalView.preferredFramesPerSecond = 60
         metalView.enableSetNeedsDisplay = true
         metalView.isPaused = false
@@ -99,7 +99,6 @@ struct MetalViewRepresentable: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: MetalView, context: Context) {
-        // Здесь можно обновить параметры MetalView при изменении состояния
-        nsView.animationSpeed = 0.5
+        nsView.animationSpeed = 1.0
     }
 }
