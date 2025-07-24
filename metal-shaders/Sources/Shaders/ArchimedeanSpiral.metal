@@ -23,7 +23,7 @@ fragment float4 archimedeanSpiral(VertexOut in [[stage_in]], constant Uniforms &
         float d = abs(distance - r);
 
         if (d <= thickness) {
-            float3 color = neonPalette(sin(distance + uniforms.time));
+            float3 color = neonPalette(sin(distance + uniforms.time) / 2);
             return float4(color, 1);
         }
     }
