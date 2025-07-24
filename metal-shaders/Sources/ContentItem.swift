@@ -48,7 +48,7 @@ enum ContentItem: String, Identifiable, CaseIterable {
     var animationSpeed: Float {
         switch self {
         case .neonCircles:
-            return 4.0
+            return 1.0
         default:
             return 1.0
         }
