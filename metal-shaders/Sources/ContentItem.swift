@@ -13,6 +13,7 @@ enum ContentItem: String, Identifiable, CaseIterable {
     case animatedGradient
     case blackWhiteCircles
     case neonCircles
+    case archimedeanSpiral
 
     var fragmentFunctionName: String {
         switch self {
@@ -22,6 +23,8 @@ enum ContentItem: String, Identifiable, CaseIterable {
             return "blackWhiteAnimatedCircles"
         case .neonCircles:
             return "neonCircles"
+        case .archimedeanSpiral:
+            return "archimedeanSpiral"
         }
     }
 
@@ -29,7 +32,7 @@ enum ContentItem: String, Identifiable, CaseIterable {
         switch self {
         case .animatedGradient:
             return "normalizedVertexShader"
-        case .blackWhiteCircles, .neonCircles:
+        case .blackWhiteCircles, .neonCircles, .archimedeanSpiral:
             return "defaultVertexShader"
         }
     }
@@ -42,13 +45,15 @@ enum ContentItem: String, Identifiable, CaseIterable {
             return "Black and White Animated Circles"
         case .neonCircles:
             return "Neon Circles"
+        case .archimedeanSpiral:
+            return "Archimedean Spiral"
         }
     }
 
     var animationSpeed: Float {
         switch self {
-        case .neonCircles:
-            return 1.0
+        case .archimedeanSpiral:
+            return 2.0
         default:
             return 1.0
         }
