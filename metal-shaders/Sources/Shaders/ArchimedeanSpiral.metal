@@ -7,6 +7,7 @@
 
 #include <metal_stdlib>
 #include "DefaultTypes.h"
+#include "Palette.h"
 using namespace metal;
 
 fragment float4 archimedeanSpiral(VertexOut in [[stage_in]], constant Uniforms &uniforms [[buffer(0)]], constant float &n [[buffer(2)]]) {
@@ -20,8 +21,10 @@ fragment float4 archimedeanSpiral(VertexOut in [[stage_in]], constant Uniforms &
         float rotatedTheta = fmod(theta + uniforms.time, 2.0 * M_PI_F);
         float r = b * (rotatedTheta + i * 2.0 * M_PI_F);
         float d = abs(distance - r);
+
         if (d <= thickness) {
-            return float4(1, 1, 1, 1);
+            float3 color = neonPalette(sin(distance + uniforms.time));
+            return float4(color, 1);
         }
     }
     
