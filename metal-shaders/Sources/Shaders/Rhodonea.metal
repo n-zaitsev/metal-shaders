@@ -10,48 +10,84 @@
 #include "Palette.h"
 using namespace metal;
 
-constant float b = 0.08;
-constant float n = 12;
-constant float shadowWidth = 0.005;
-constant float ratio = (1.0 + b) / (1.0 - b);
-constant int LAYERS = 7;
+// Rhodonea Fragment Shader — Draws layered rose curves with shadows
 
+constant float b = 0.08;                      // Petal shape parameter
+constant float n = 12;                        // Number of petals / frequency
+constant float shadowWidth = 0.005;           // Width of the highlight ring (shadow edge)
+constant float ratio = (1.0 + b) / (1.0 - b); // Ratio used to scale base radius between layers
+constant int LAYERS = 7;                      // Total number of rose curve layers
+constant float4 baseColor   = float4(0.769, 0.753, 0.737, 1.0);
+
+// Adjust the base radius for the next layer based on its index
 void update_radius(thread float &radius, float i) {
     if (i > 4) {
-        radius *= ratio - 0.01 / (1.0 - b);
+        radius *= ratio - 0.01 / (1.0 - b);   // Slightly reduce growth rate for outer layers
     } else {
-        radius *= ratio + 0.03 / (1.0 - b);
+        radius *= ratio + 0.03 / (1.0 - b);   // Slightly increase growth rate for inner layers
     }
 }
 
+float4 first_petal_color(float distance) {
+    const float darkness = 0.6;
+    const float blur = 0.2;
+    const float4 shadowColor = float4(baseColor.rgb * darkness, baseColor.a);
+    const float t = smoothstep(distance, distance - blur, 0.1);
+
+    return mix(baseColor, shadowColor, t);
+}
+
+float4 shadow_petal(float distance, float radius) {
+    const float ringWidth  = 0.2;
+    float inner = radius - ringWidth;
+    float outer = radius;
+
+    float t = smoothstep(inner, outer, distance);
+
+    float4 shadowColor = float4(1, 1, 1, 1);
+
+    return mix(float4(0, 0, 0, 1), shadowColor, t);
+}
+
+float rhodonea_radius(float r0, int i, int n, int sign, float theta) {
+    float rotation = float(i) * (M_PI_F / n);     // Compute angular offset for layer
+    float theta_i = theta + sign * rotation;      // Alternate rotation direction each layer
+
+    return r0 * (1.0 + b * cos(n * theta_i));
+}
+
+// Fragment function: Draw rhodonea pattern based on texture coordinate
 fragment float4 rhodonea(VertexOut in [[stage_in]], constant Uniforms &uniforms [[buffer(0)]]) {
-    const float distance = length(in.texCoord);
-    const float theta = atan2(in.texCoord.y, in.texCoord.x) + M_PI_F / n;
-    
-    float r0 = 0.2;
+    const float distance = length(in.texCoord); // Distance from center (polar coordinate r)
+    const float theta = atan2(in.texCoord.y, in.texCoord.x) + M_PI_F / n; // Angle from x-axis + offset
 
+    float r0 = 0.2; // Initial base radius for the first layer
+
+    // Loop through all rhodonea layers
     for (int i = 1, sign = 1; i <= LAYERS; ++i) {
-        float rotation = float(i) * (M_PI_F / n);
+        float r = rhodonea_radius(r0, i, n, sign, theta);
 
-        float theta_i = theta + sign * rotation;
-
-        float r = r0 * (1.0 + b * cos(n * theta_i));
-
+        // If pixel is within the highlight ring (edge of petal), draw it white
         if (distance <= r && distance >= r - shadowWidth) {
+            return float4(1, 0, 0, 1);
+        }
+
+        // If pixel is inside the petal (past the shadow edge), draw it with layer brightness
+        if (i == 1 && distance <= r - shadowWidth) {
+            return first_petal_color(distance);
+        } else if (i < LAYERS && distance <= r - shadowWidth) {
+            float radius = r0 * (1 + b);
+            return shadow_petal(distance, radius);
+        } else if (distance <= r - shadowWidth) {
             return float4(1, 1, 1, 1);
         }
 
-        float layerDarkness = float(i) / float(LAYERS);
-        float baseBrightness = mix(0.6, 1.0, 0.0 + layerDarkness);
-
-        if (distance <= r - shadowWidth) {
-            return float4(baseBrightness, baseBrightness, baseBrightness, 1);
-        }
-
+        // Prepare for next layer: alternate rotation direction and update base radius
         sign *= -1;
         update_radius(r0, i);
     }
 
+    // Background color if no petal matched
     return float4(0.95, 0.95, 0.95, 1);
 }
 
