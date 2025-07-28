@@ -17,7 +17,7 @@ constant float n = 12;                        // Number of petals / frequency
 constant float shadowWidth = 0.005;           // Width of the highlight ring (shadow edge)
 constant float ratio = (1.0 + b) / (1.0 - b); // Ratio used to scale base radius between layers
 constant int LAYERS = 7;                      // Total number of rose curve layers
-constant float4 baseColor = float4(0.643, 0.624, 0.608, 1);
+constant float4 baseColor = float4(232.0/255.0, 137.0/255.0, 0, 1);
 
 // Adjust the base radius for the next layer based on its index
 void update_radius(thread float &radius, float i) {
@@ -49,28 +49,27 @@ float4 shadow_petal(float distance, float radius, int layer, float time) {
     return mix(baseColor, shadowColor, t);
 }
 
-float rhodonea_radius(float r0, int i, int n, int sign, float theta) {
+float rhodonea_radius(float r0, int i, int n, int sign, float theta, float time) {
     float rotation = float(i) * (M_PI_F / n);     // Compute angular offset for layer
-    float theta_i = theta + sign * rotation;      // Alternate rotation direction each layer
-
+    float theta_i = theta + rotation;      // Alternate rotation direction each layer
     return r0 * (1.0 + b * cos(n * theta_i));
 }
 
 // Fragment function: Draw rhodonea pattern based on texture coordinate
 fragment float4 rhodonea(VertexOut in [[stage_in]], constant Uniforms &uniforms [[buffer(0)]]) {
     const float distance = length(in.texCoord); // Distance from center (polar coordinate r)
-    const float theta = atan2(in.texCoord.y, in.texCoord.x) + M_PI_F / n; // Angle from x-axis + offset
+    const float theta = min(atan2(in.texCoord.y, in.texCoord.x) + M_PI_F / n + uniforms.time, atan2(in.texCoord.y, in.texCoord.x) + M_PI_F); // Angle from x-axis + offset
 
-    float r0 = 0.2; // Initial base radius for the first layer
+    float r0 = min(0.2, 0.1 * uniforms.time); // Initial base radius for the first layer
     float prev_r = r0;
     float r = 0;
     // Loop through all rhodonea layers
     for (int i = 1, sign = 1; i <= LAYERS; ++i) {
-        r = rhodonea_radius(r0, i, n, sign, theta);
+        r = rhodonea_radius(r0, i, n, sign, theta, uniforms.time);
 
         // If pixel is within the highlight ring (edge of petal), draw it white
         if (distance <= r && distance >= r - shadowWidth) {
-            return float4(1, 1, 1, 1);
+            return float4(0, 0, 0, 1);
         }
 
         // If pixel is inside the petal (past the shadow edge), draw it with layer brightness

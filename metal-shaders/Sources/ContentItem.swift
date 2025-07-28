@@ -62,7 +62,7 @@ enum ContentItem: String, Identifiable, CaseIterable {
 
     var animationSpeed: Float {
         switch self {
-        case .archimedeanSpiral:
+        case .archimedeanSpiral, .rhodonea:
             return 2.0
         default:
             return 1.0
