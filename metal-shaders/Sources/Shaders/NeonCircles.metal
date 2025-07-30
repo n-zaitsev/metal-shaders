@@ -6,8 +6,8 @@
 //
 
 #include <metal_stdlib>
-#include "DefaultTypes.h"
-#include "Palette.h"
+#include "../Headers/DefaultTypes.h"
+#include "../Headers/Palette.h"
 using namespace metal;
 
 fragment float4 neonCircles(VertexOut in [[stage_in]], constant Uniforms &uniforms [[buffer(0)]]) {

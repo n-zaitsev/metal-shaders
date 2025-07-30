@@ -6,7 +6,7 @@
 //
 
 #include <metal_stdlib>
-#include "DefaultTypes.h"
+#include "../Headers/DefaultTypes.h"
 using namespace metal;
 
 float4 gradient(float2 fragCoord, float2 resolution, float time) {

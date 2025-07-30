@@ -6,8 +6,8 @@
 //
 
 #include <metal_stdlib>
-#include "DefaultTypes.h"
-#include "Palette.h"
+#include "../Headers/DefaultTypes.h"
+#include "../Headers/Palette.h"
 using namespace metal;
 
 // Rhodonea Fragment Shader — Draws layered rose curves with shadows

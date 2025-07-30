@@ -6,7 +6,7 @@
 //
 
 #include <metal_stdlib>
-#include "DefaultTypes.h"
+#include "../Headers/DefaultTypes.h"
 using namespace metal;
 
 constant float radius = 1.0;

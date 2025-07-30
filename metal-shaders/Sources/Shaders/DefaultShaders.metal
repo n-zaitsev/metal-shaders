@@ -6,7 +6,7 @@
 //
 
 #include <metal_stdlib>
-#include "DefaultTypes.h"
+#include "../Headers/DefaultTypes.h"
 using namespace metal;
 
 vertex VertexOut normalizedVertexShader(uint vertexID [[vertex_id]], constant float2 *vertices [[buffer(0)]]) {

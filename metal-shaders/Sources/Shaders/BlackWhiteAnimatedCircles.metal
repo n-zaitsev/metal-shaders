@@ -6,7 +6,7 @@
 //
 
 #include <metal_stdlib>
-#include "DefaultTypes.h"
+#include "../Headers/DefaultTypes.h"
 using namespace metal;
 
 fragment float4 blackWhiteAnimatedCircles(VertexOut in [[stage_in]], constant Uniforms &uniforms [[buffer(0)]]) {
