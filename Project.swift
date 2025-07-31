@@ -11,6 +11,10 @@ let project = Project(
             infoPlist: .default,
             sources: ["metal-shaders/Sources/**"],
             resources: ["metal-shaders/Resources/**"],
+            headers: .headers(
+                public: "metal-shaders/Sources/**/*.h",
+                project: "metal-shaders/Sources/**/*.h"
+            ),
             dependencies: []
         ),
         .target(
