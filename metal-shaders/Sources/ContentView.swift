@@ -35,11 +35,9 @@ public struct ContentView: View {
                     Section(header: Text(section.title)) {
                         ForEach(viewModel.items[section] ?? [], id: \.self) { item in
                             NavigationLink(item.title) {
-                                MetalViewRepresentable(
-                                    animationSpeed: item.animationSpeed,
-                                    contentItem: item
-                                )
-                                .navigationTitle(item.title)
+                                MetalViewFactory
+                                    .makeView(for: item)
+                                    .navigationTitle(item.title)
                             }
                         }
                     }

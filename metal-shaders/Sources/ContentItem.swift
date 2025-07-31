@@ -38,7 +38,9 @@ enum ContentItem: String, Identifiable, CaseIterable {
         switch self {
         case .animatedGradient:
             return "normalizedVertexShader"
-        case .blackWhiteCircles, .neonCircles, .archimedeanSpiral, .heart, .rhodonea:
+        case .heart, .rhodonea:
+            return "defaultStaticVertexShader"
+        case .blackWhiteCircles, .neonCircles, .archimedeanSpiral:
             return "defaultVertexShader"
         }
     }
@@ -57,15 +59,6 @@ enum ContentItem: String, Identifiable, CaseIterable {
             return "Heart"
         case .rhodonea:
             return "Rhodonea"
-        }
-    }
-
-    var animationSpeed: Float {
-        switch self {
-        case .archimedeanSpiral, .rhodonea:
-            return 2.0
-        default:
-            return 1.0
         }
     }
 }

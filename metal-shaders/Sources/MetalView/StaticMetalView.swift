@@ -1,25 +1,21 @@
 //
-//  MetalView.swift
+//  StaticMetalView.swift
 //  metal-shaders
 //
-//  Created by Nikita Zaitsev on 30/05/2025.
+//  Created by Nikita Zaitsev on 31/07/2025.
 //
 
 import MetalKit
 import SwiftUI
 
-struct Uniforms {
+struct StaticUniforms {
     var resolution: SIMD2<Float>
-    var time: Float
-    var padding: Float = 0
 }
 
-final class MetalView: MTKView {
-    private var commandQueue: MTLCommandQueue!
-    private var pipelineState: MTLRenderPipelineState!
-    private var time: Float = 0.0
-    private var vertexBuffer: MTLBuffer!
-    var animationSpeed: Float = 1
+class StaticMetalView: MTKView {
+    private(set) var commandQueue: MTLCommandQueue!
+    private(set) var pipelineState: MTLRenderPipelineState!
+    private(set) var vertexBuffer: MTLBuffer!
     private let contentItem: ContentItem
 
     let vertices: [SIMD2<Float>] = [
@@ -27,10 +23,9 @@ final class MetalView: MTKView {
         [-1.0, 1.0], [1.0, -1.0], [1.0, 1.0]
     ]
 
-    init(frame: CGRect, animationSpeed: Float = 1.0, contentItem: ContentItem) {
+    init(frame: CGRect, contentItem: ContentItem) {
         self.contentItem = contentItem
         super.init(frame: frame, device: MTLCreateSystemDefaultDevice())
-        self.animationSpeed = animationSpeed
         setupMetal()
     }
 
@@ -52,13 +47,6 @@ final class MetalView: MTKView {
         pipelineDescriptor.vertexFunction = vertexFunction
         pipelineDescriptor.fragmentFunction = fragmentFunction
         pipelineDescriptor.colorAttachments[0].pixelFormat = self.colorPixelFormat
-        pipelineDescriptor.colorAttachments[0].isBlendingEnabled = true
-        pipelineDescriptor.colorAttachments[0].rgbBlendOperation   = .add
-        pipelineDescriptor.colorAttachments[0].alphaBlendOperation = .add
-        pipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor   = .sourceAlpha
-        pipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
-        pipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor   = .one
-        pipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
 
         do {
             self.pipelineState = try device.makeRenderPipelineState(descriptor: pipelineDescriptor)
@@ -67,7 +55,6 @@ final class MetalView: MTKView {
         }
 
         vertexBuffer = device.makeBuffer(bytes: vertices, length: MemoryLayout<SIMD2<Float>>.stride * vertices.count, options: [])
-
     }
 
     override func draw(_ rect: CGRect) {
@@ -80,42 +67,33 @@ final class MetalView: MTKView {
 
         commandEncoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
 
-        var uniforms = Uniforms(
-            resolution: SIMD2<Float>(Float(rect.width), Float(rect.height)),
-            time: time
-        )
+        var uniforms = StaticUniforms(resolution: SIMD2<Float>(Float(rect.width), Float(rect.height)))
 
-        commandEncoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.size, index: 1)
-        commandEncoder.setFragmentBytes(&uniforms, length: MemoryLayout<Uniforms>.size, index: 0)
+        commandEncoder.setVertexBytes(&uniforms, length: MemoryLayout<StaticUniforms>.size, index: 1)
+        commandEncoder.setFragmentBytes(&uniforms, length: MemoryLayout<StaticUniforms>.size, index: 0)
 
         commandEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: vertices.count)
 
         commandEncoder.endEncoding()
         commandBuffer.present(drawable)
         commandBuffer.commit()
-
-        time += 0.01 * animationSpeed
     }
 }
 
-struct MetalViewRepresentable: NSViewRepresentable {
-    private let animationSpeed: Float
+struct StaticMetalViewRepresentable: NSViewRepresentable {
     private let contentItem: ContentItem
 
-    init(animationSpeed: Float, contentItem: ContentItem) {
-        self.animationSpeed = animationSpeed
+    init(contentItem: ContentItem) {
         self.contentItem = contentItem
     }
 
-    func makeNSView(context: Context) -> MetalView {
-        let metalView = MetalView(frame: .zero, animationSpeed: animationSpeed, contentItem: contentItem)
+    func makeNSView(context: Context) -> StaticMetalView {
+        let metalView = StaticMetalView(frame: .zero, contentItem: contentItem)
         metalView.preferredFramesPerSecond = 60
         metalView.enableSetNeedsDisplay = true
         metalView.isPaused = false
         return metalView
     }
 
-    func updateNSView(_ nsView: MetalView, context: Context) {
-        nsView.animationSpeed = animationSpeed
-    }
+    func updateNSView(_ nsView: StaticMetalView, context: Context) {}
 }

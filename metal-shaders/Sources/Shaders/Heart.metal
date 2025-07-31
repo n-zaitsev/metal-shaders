@@ -14,7 +14,7 @@ constant float2 shadowOffset = float2(0.1, -0.1); // Смещение тени (
 constant float shadowBlur = 0.3; // Размытие тени
 constant float4 shadowColor = float4(0.0, 0.0, 0.0, 0.5); // Цвет тени с прозрачностью
 
-fragment float4 heart(VertexOut in [[stage_in]], constant Uniforms& u [[buffer(0)]]) {
+fragment float4 heart(VertexOut in [[stage_in]], constant StaticUniforms& u [[buffer(0)]]) {
     float2 coord = in.texCoord;
     
     // Расстояние до центра основной фигуры

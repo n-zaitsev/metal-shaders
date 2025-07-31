@@ -16,9 +16,17 @@ struct VertexOut {
     float2 texCoord;
 };
 
+struct StaticUniforms {
+    float2 resolution;
+};
+
 struct Uniforms {
     float2 resolution;
     float time;
+};
+
+struct ConfigurableUniforms {
+    float2 resolution;
 };
 
 #endif /* DefaultTypes_h */

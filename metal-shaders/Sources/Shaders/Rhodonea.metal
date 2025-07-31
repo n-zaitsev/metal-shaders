@@ -56,16 +56,16 @@ float rhodonea_radius(float r0, int i, int n, int sign, float theta, float time)
 }
 
 // Fragment function: Draw rhodonea pattern based on texture coordinate
-fragment float4 rhodonea(VertexOut in [[stage_in]], constant Uniforms &uniforms [[buffer(0)]]) {
+fragment float4 rhodonea(VertexOut in [[stage_in]], constant ConfigurableUniforms &uniforms [[buffer(0)]]) {
     const float distance = length(in.texCoord); // Distance from center (polar coordinate r)
-    const float theta = min(atan2(in.texCoord.y, in.texCoord.x) + M_PI_F / n + uniforms.time, atan2(in.texCoord.y, in.texCoord.x) + M_PI_F); // Angle from x-axis + offset
+    const float theta = min(atan2(in.texCoord.y, in.texCoord.x) + M_PI_F / n /*+ uniforms.time*/, atan2(in.texCoord.y, in.texCoord.x) + M_PI_F); // Angle from x-axis + offset
 
-    float r0 = min(0.2, 0.1 * uniforms.time); // Initial base radius for the first layer
+    float r0 = min(0.2, 0.1 /** uniforms.time*/); // Initial base radius for the first layer
     float prev_r = r0;
     float r = 0;
     // Loop through all rhodonea layers
     for (int i = 1, sign = 1; i <= LAYERS; ++i) {
-        r = rhodonea_radius(r0, i, n, sign, theta, uniforms.time);
+        r = rhodonea_radius(r0, i, n, sign, theta, 1.0/*uniforms.time*/);
 
         // If pixel is within the highlight ring (edge of petal), draw it white
         if (distance <= r && distance >= r - shadowWidth) {
@@ -78,7 +78,7 @@ fragment float4 rhodonea(VertexOut in [[stage_in]], constant Uniforms &uniforms 
             return first_petal_color(distance, baseColor);
         } else if (i < LAYERS && distance <= r - shadowWidth) {
             float radius = r0 * (1 + b);
-            return shadow_petal(distance, radius, i - 1, uniforms.time);
+            return shadow_petal(distance, radius, i - 1, 1.0/*uniforms.time*/);
         } else if (distance <= r - shadowWidth) {
             float inner = prev_r;
             float outer = prev_r + 0.05;

@@ -16,6 +16,13 @@ vertex VertexOut normalizedVertexShader(uint vertexID [[vertex_id]], constant fl
     return out;
 }
 
+vertex VertexOut defaultStaticVertexShader(uint vertexID [[vertex_id]], constant float2 *vertices [[buffer(0)]], constant StaticUniforms &uniforms [[buffer(1)]]) {
+    VertexOut out;
+    out.position = float4(vertices[vertexID], 0.0, 1.0);
+    out.texCoord = vertices[vertexID] * uniforms.resolution / uniforms.resolution.y;
+    return out;
+}
+
 vertex VertexOut defaultVertexShader(uint vertexID [[vertex_id]], constant float2 *vertices [[buffer(0)]], constant Uniforms &uniforms [[buffer(1)]]) {
     VertexOut out;
     out.position = float4(vertices[vertexID], 0.0, 1.0);
